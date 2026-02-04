@@ -2,7 +2,7 @@
  * Chiemela Onyenso
  * This is my project that will implement JFrame to create a game of Tic-Tac-Toe.
  * The program will begin with a Start, Rules, and Exit option. It will have a 1 player and 2 player game mode - games will always begin with X first.
- * This project uses different JPanel's to establish a menu screen, mode select screen, and a game screen.
+ * This project uses different JPanel's to establish different screens.
  */
 
 import java.awt.*;
@@ -16,10 +16,13 @@ public class TicTacToe extends JFrame implements ActionListener {
     private JButton player1Button; // Chooses 1 player mode
     private JButton player2Button; // Chooses 2 player mode
     private JButton backButton; // Sends user back to the previous screen
+    private JButton[][] boardButtons; // 3x3 2D array to hold buttons for boardPanel
     private JPanel mainPanel; // The panel that uses CardLayout
     private JPanel menuPanel; // Holds the menu screen
     private JPanel modeSelectPanel; // Holds the mode select screen
     private JPanel gamePanel; // Holds the game screen
+    private JPanel boardPanel; // Holds the Tic Tac Toe grid
+    private JPanel centerWrapper; // Centers the game board without stretching it
     private CardLayout cardLayout; // The CardLayout manager
 
     TicTacToe() {
@@ -34,7 +37,7 @@ public class TicTacToe extends JFrame implements ActionListener {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Set frame size
-        setSize(400, 300);
+        setSize(600, 500);
 
         // Center JFrame on screen
         setLocationRelativeTo(null);
@@ -115,7 +118,40 @@ public class TicTacToe extends JFrame implements ActionListener {
         layoutConst.gridy = 3;
         modeSelectPanel.add(backButton, layoutConst);
 
-        gamePanel = new JPanel();
+        // Board Panel
+        boardPanel = new JPanel(new GridLayout(3, 3));
+
+        // Set the preferred size
+        boardPanel.setPreferredSize(new Dimension(450, 450));
+
+        // 3x3 2D array to hold buttons
+        boardButtons = new JButton[3][3];
+
+        // Creates and adds the buttons to boardPanel
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 3; col++) {
+                boardButtons[row][col] = new JButton(""); // Each button starts blank
+
+                // Add action listeners & font
+                boardButtons[row][col].addActionListener(this);
+                boardButtons[row][col].setFont(new Font("Serif", Font.BOLD, 60));
+
+                // Disables the focus outline
+                boardButtons[row][col].setFocusable(false);
+
+                boardPanel.add(boardButtons[row][col]);
+            }
+        }
+
+        // Game Panel
+        gamePanel = new JPanel(new BorderLayout());
+
+        // Wraps around boardPanel to prevent stretching
+        centerWrapper = new JPanel(new GridBagLayout());
+        centerWrapper.add(boardPanel);
+
+        // Adds the game board to game panel & centers it
+        gamePanel.add(centerWrapper, BorderLayout.CENTER);
 
         // Add the panels to mainPanel
         mainPanel.add(menuPanel, "MENU");
@@ -153,7 +189,7 @@ public class TicTacToe extends JFrame implements ActionListener {
         } else if (event.getSource() == player1Button) {
             // TODO:
         } else if (event.getSource() == player2Button) {
-            // TODO:
+            cardLayout.show(mainPanel, "GAME");
         } else if (event.getSource() == backButton) {
             cardLayout.show(mainPanel, "MENU");
         }
