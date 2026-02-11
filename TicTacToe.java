@@ -24,6 +24,7 @@ public class TicTacToe extends JFrame implements ActionListener {
     private JPanel boardPanel; // Holds the Tic Tac Toe grid
     private JPanel centerWrapper; // Centers the game board without stretching it
     private CardLayout cardLayout; // The CardLayout manager
+    private char currentPlayer; // Holds the player who has the turn - either x or o
 
     TicTacToe() {
 
@@ -161,6 +162,9 @@ public class TicTacToe extends JFrame implements ActionListener {
         // Add mainPanel to JFrame and show menu screen
         add(mainPanel);
         cardLayout.show(mainPanel, "MENU");
+
+        currentPlayer = 'X';
+
         setVisible(true);
     }
 
@@ -189,9 +193,24 @@ public class TicTacToe extends JFrame implements ActionListener {
         } else if (event.getSource() == player1Button) {
             // TODO:
         } else if (event.getSource() == player2Button) {
+            currentPlayer = 'X';
             cardLayout.show(mainPanel, "GAME");
+
         } else if (event.getSource() == backButton) {
             cardLayout.show(mainPanel, "MENU");
+        }
+
+        // Board buttons behavior:
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 3; col++) {
+                if (event.getSource() == boardButtons[row][col]) {
+                    boardButtons[row][col].setText(String.valueOf(currentPlayer)); // Marks an X or O in the square
+                    boardButtons[row][col].setEnabled(false); // Disables the button
+
+                    currentPlayer = (currentPlayer == 'X') ? 'O' : 'X'; // Switches X -> O or O -> X for next player
+                    return; // Exits the method
+                }
+            }
         }
     }
 
