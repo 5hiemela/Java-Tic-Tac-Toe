@@ -195,7 +195,6 @@ public class TicTacToe extends JFrame implements ActionListener {
         } else if (event.getSource() == player2Button) {
             currentPlayer = 'X';
             cardLayout.show(mainPanel, "GAME");
-
         } else if (event.getSource() == backButton) {
             cardLayout.show(mainPanel, "MENU");
         }
@@ -207,11 +206,63 @@ public class TicTacToe extends JFrame implements ActionListener {
                     boardButtons[row][col].setText(String.valueOf(currentPlayer)); // Marks an X or O in the square
                     boardButtons[row][col].setEnabled(false); // Disables the button
 
+                    // Checks if a player has won before switching to next player's turn
+                    char winner = checkWinner();
+                    if (winner != '\0') {
+                        JOptionPane.showMessageDialog(this, winner + " wins!");
+                        // Reset the board
+                        return;
+                    }
+
                     currentPlayer = (currentPlayer == 'X') ? 'O' : 'X'; // Switches X -> O or O -> X for next player
                     return; // Exits the method
                 }
             }
         }
+    }
+
+    private char checkWinner() {
+        // Checks for any 'row' wins
+        for (int row = 0; row < 3; row++) {
+            String a = boardButtons[row][0].getText();
+            String b = boardButtons[row][1].getText();
+            String c = boardButtons[row][2].getText();
+
+            // First letter cannot be empty & all three must be equal
+            if (!a.isEmpty() && a.equals(b) && a.equals(c)) {
+                return a.charAt(0); // 'X' or 'O'
+            }
+        }
+
+        // Checks for any 'column' wins
+        for (int col = 0; col < 3; col++) {
+            String a = boardButtons[0][col].getText();
+            String b = boardButtons[1][col].getText();
+            String c = boardButtons[2][col].getText();
+
+            if (!a.isEmpty() && a.equals(b) && a.equals(c)) {
+                return a.charAt(0);
+            }
+        }
+
+        // Checks for any 'diagonal' wins
+        String middle = boardButtons[1][1].getText();
+        if (!middle.isEmpty()) {
+
+            String d1a = boardButtons[0][0].getText();
+            String d1c = boardButtons[2][2].getText();
+            if (middle.equals(d1a) && middle.equals(d1c)) {
+                return middle.charAt(0);
+            }
+
+            String d2a = boardButtons[0][2].getText();
+            String d2c = boardButtons[2][0].getText();
+            if (middle.equals(d2a) && middle.equals(d2c)) {
+                return middle.charAt(0);
+            }
+        }
+
+        return '\0'; // no winner
     }
 
     public static void main(String[] args) {
