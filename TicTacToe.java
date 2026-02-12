@@ -193,7 +193,7 @@ public class TicTacToe extends JFrame implements ActionListener {
         } else if (event.getSource() == player1Button) {
             // TODO:
         } else if (event.getSource() == player2Button) {
-            currentPlayer = 'X';
+            resetBoard();
             cardLayout.show(mainPanel, "GAME");
         } else if (event.getSource() == backButton) {
             cardLayout.show(mainPanel, "MENU");
@@ -210,7 +210,14 @@ public class TicTacToe extends JFrame implements ActionListener {
                     char winner = checkWinner();
                     if (winner != '\0') {
                         JOptionPane.showMessageDialog(this, winner + " wins!");
-                        // Reset the board
+                        resetBoard();
+                        return;
+                    }
+
+                    // Checks if there is a draw
+                    if (isBoardFull()) {
+                        JOptionPane.showMessageDialog(this, "It's a Draw!");
+                        resetBoard();
                         return;
                     }
 
@@ -263,6 +270,28 @@ public class TicTacToe extends JFrame implements ActionListener {
         }
 
         return '\0'; // no winner
+    }
+
+    private void resetBoard() {
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 3; col++) {
+                boardButtons[row][col].setText("");
+                boardButtons[row][col].setEnabled(true);
+            }
+        }
+        currentPlayer = 'X';
+        // UPDATE TURN LABEL (when I implement it)
+    }
+
+    private boolean isBoardFull() {
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 3; col++) {
+                if (boardButtons[row][col].getText().isEmpty()) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     public static void main(String[] args) {
