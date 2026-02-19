@@ -15,7 +15,9 @@ public class TicTacToe extends JFrame implements ActionListener {
     private JButton quitButton; // Exits application
     private JButton player1Button; // Chooses 1 player mode
     private JButton player2Button; // Chooses 2 player mode
-    private JButton backButton; // Sends user back to the previous screen
+    private JButton modeBackButton; // Sends user back to menu screen
+    private JButton gameBackButton; // Sends user back to mode screen
+    private JButton resetButton; // Resets the board
     private JButton[][] boardButtons; // 3x3 2D array to hold buttons for boardPanel
     private JPanel mainPanel; // The panel that uses CardLayout
     private JPanel menuPanel; // Holds the menu screen
@@ -24,6 +26,7 @@ public class TicTacToe extends JFrame implements ActionListener {
     private JPanel boardPanel; // Holds the Tic Tac Toe grid
     private JPanel centerWrapper; // Centers the game board without stretching it
     private CardLayout cardLayout; // The CardLayout manager
+    private JLabel turnLabel; // Shows whose turn it is
     private char currentPlayer; // Holds the player who has the turn - either x or o
 
     TicTacToe() {
@@ -43,10 +46,11 @@ public class TicTacToe extends JFrame implements ActionListener {
         // Center JFrame on screen
         setLocationRelativeTo(null);
 
-        // Create Labels
+        // Create & Configure Labels
         JLabel welcomeLabel = new JLabel("Welcome to Tic-Tac-Toe!"); // Menu welcome message
         JLabel modeLabel = new JLabel("Choose a mode!"); // Mode select message
-        // More labels will be added soon
+        turnLabel = new JLabel("Turn: X", SwingConstants.CENTER); // Current player message
+        turnLabel.setFont(new Font("Serif", Font.BOLD, 22));
 
         // Create Buttons and add action listeners
         startButton = new JButton("Start");
@@ -64,8 +68,14 @@ public class TicTacToe extends JFrame implements ActionListener {
         player2Button = new JButton("2 Player");
         player2Button.addActionListener(this);
 
-        backButton = new JButton("Back");
-        backButton.addActionListener(this);
+        modeBackButton = new JButton("Back");
+        modeBackButton.addActionListener(this);
+
+        gameBackButton = new JButton("Back");
+        gameBackButton.addActionListener(this);
+
+        resetButton = new JButton("Reset");
+        resetButton.addActionListener(this);
 
         // Create the CardLayout
         cardLayout = new CardLayout();
@@ -117,7 +127,7 @@ public class TicTacToe extends JFrame implements ActionListener {
 
         layoutConst.gridx = 0;
         layoutConst.gridy = 3;
-        modeSelectPanel.add(backButton, layoutConst);
+        modeSelectPanel.add(modeBackButton, layoutConst);
 
         // Board Panel
         boardPanel = new JPanel(new GridLayout(3, 3));
@@ -146,6 +156,7 @@ public class TicTacToe extends JFrame implements ActionListener {
 
         // Game Panel
         gamePanel = new JPanel(new BorderLayout());
+        gamePanel.add(turnLabel, BorderLayout.NORTH);
 
         // Wraps around boardPanel to prevent stretching
         centerWrapper = new JPanel(new GridBagLayout());
@@ -153,6 +164,14 @@ public class TicTacToe extends JFrame implements ActionListener {
 
         // Adds the game board to game panel & centers it
         gamePanel.add(centerWrapper, BorderLayout.CENTER);
+
+        // Panel to hold reset and back buttons
+        JPanel gameButtonPanel = new JPanel();
+
+        gameButtonPanel.add(resetButton);
+        gameButtonPanel.add(gameBackButton);
+
+        gamePanel.add(gameButtonPanel, BorderLayout.SOUTH);
 
         // Add the panels to mainPanel
         mainPanel.add(menuPanel, "MENU");
@@ -195,8 +214,13 @@ public class TicTacToe extends JFrame implements ActionListener {
         } else if (event.getSource() == player2Button) {
             resetBoard();
             cardLayout.show(mainPanel, "GAME");
-        } else if (event.getSource() == backButton) {
+        } else if (event.getSource() == modeBackButton) {
             cardLayout.show(mainPanel, "MENU");
+        } else if (event.getSource() == gameBackButton) {
+            resetBoard();
+            cardLayout.show(mainPanel, "MODE");
+        } else if (event.getSource() == resetButton) {
+            resetBoard();
         }
 
         // Board buttons behavior:
@@ -222,6 +246,7 @@ public class TicTacToe extends JFrame implements ActionListener {
                     }
 
                     currentPlayer = (currentPlayer == 'X') ? 'O' : 'X'; // Switches X -> O or O -> X for next player
+                    turnLabel.setText("Turn: " + currentPlayer); // Update turn label
                     return; // Exits the method
                 }
             }
@@ -280,7 +305,7 @@ public class TicTacToe extends JFrame implements ActionListener {
             }
         }
         currentPlayer = 'X';
-        // UPDATE TURN LABEL (when I implement it)
+        turnLabel.setText("Turn: X");
     }
 
     private boolean isBoardFull() {
