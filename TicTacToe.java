@@ -233,15 +233,42 @@ public class TicTacToe extends JFrame implements ActionListener {
                     // Checks if a player has won before switching to next player's turn
                     char winner = checkWinner();
                     if (winner != '\0') {
-                        JOptionPane.showMessageDialog(this, winner + " wins!");
-                        resetBoard();
+
+                        // Choose whether to play again
+                        int choice = JOptionPane.showConfirmDialog(
+                                this,
+                                winner + " wins! Play again?",
+                                "Game Over",
+                                JOptionPane.YES_NO_OPTION
+                        );
+
+                        if (choice == JOptionPane.YES_OPTION) {
+                            resetBoard(); // Starts new game
+                        } else {
+                            resetBoard();
+                            cardLayout.show(mainPanel, "MENU"); // Return to menu
+                        }
+
                         return;
                     }
 
                     // Checks if there is a draw
                     if (isBoardFull()) {
-                        JOptionPane.showMessageDialog(this, "It's a Draw!");
-                        resetBoard();
+
+                        int choice = JOptionPane.showConfirmDialog(
+                                this,
+                                "It's a draw! Play again?",
+                                "Game Over",
+                                JOptionPane.YES_NO_OPTION
+                        );
+
+                        if (choice == JOptionPane.YES_OPTION) {
+                            resetBoard();
+                        } else {
+                            resetBoard();
+                            cardLayout.show(mainPanel, "MENU");
+                        }
+
                         return;
                     }
 
