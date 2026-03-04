@@ -1,12 +1,20 @@
 /*
  * Chiemela Onyenso
- * This is my project that will implement JFrame to create a game of Tic-Tac-Toe.
- * The program will begin with a Start, Rules, and Exit option. It will have a 1 player and 2 player game mode - games will always begin with X first.
- * This project uses different JPanel's to establish different screens.
+ * Tic-Tac-Toe (Java Swing)
+ *
+ * This program creates a Tic-Tac-Toe game using JFrame and multiple JPanels with CardLayout.
+ * It includes a menu screen (Start, Rules, Quit), a mode select screen (1 Player / 2 Player),
+ * and a game screen with a reset/back button.
+ *
+ * X always goes first. In 1 Player mode, the computer plays as O.
+ * The game detects wins/draws and shows a "Play again?" dialog when the game ends.
  */
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import javax.swing.*;
 
 public class TicTacToe extends JFrame implements ActionListener {
@@ -28,6 +36,8 @@ public class TicTacToe extends JFrame implements ActionListener {
     private CardLayout cardLayout; // The CardLayout manager
     private JLabel turnLabel; // Shows whose turn it is
     private char currentPlayer; // Holds the player who has the turn - either x or o
+    private boolean onePlayerMode = false; // Keeps track of if the game is 1 player or 2 player
+    private final Random rng = new Random(); // Used for computer's move in 1 player mode.
 
     TicTacToe() {
 
@@ -189,11 +199,9 @@ public class TicTacToe extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent event) {
-        // TODO:
-        // This will handle all button clicks for the application.
-
         if (event.getSource() == startButton) {
             cardLayout.show(mainPanel, "MODE");
+
         } else if (event.getSource() == rulesButton) {
             JOptionPane.showMessageDialog(
                     this,
@@ -207,77 +215,132 @@ public class TicTacToe extends JFrame implements ActionListener {
                             "• If all spaces are filled and no one wins, the game is a draw",
                     "Rules",
                     JOptionPane.INFORMATION_MESSAGE);
+
         } else if (event.getSource() == quitButton) {
-            System.exit(0); // Ends the program
+            System.exit(0);
+
         } else if (event.getSource() == player1Button) {
-            // TODO:
-        } else if (event.getSource() == player2Button) {
+            onePlayerMode = true;
             resetBoard();
             cardLayout.show(mainPanel, "GAME");
+
+        } else if (event.getSource() == player2Button) {
+            onePlayerMode = false;
+            resetBoard();
+            cardLayout.show(mainPanel, "GAME");
+
         } else if (event.getSource() == modeBackButton) {
             cardLayout.show(mainPanel, "MENU");
+
         } else if (event.getSource() == gameBackButton) {
             resetBoard();
             cardLayout.show(mainPanel, "MODE");
+
         } else if (event.getSource() == resetButton) {
             resetBoard();
         }
 
-        // Board buttons behavior:
+        // Board buttons behavior (human click)
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
                 if (event.getSource() == boardButtons[row][col]) {
-                    boardButtons[row][col].setText(String.valueOf(currentPlayer)); // Marks an X or O in the square
-                    boardButtons[row][col].setEnabled(false); // Disables the button
 
-                    // Checks if a player has won before switching to next player's turn
-                    char winner = checkWinner();
-                    if (winner != '\0') {
-
-                        // Choose whether to play again
-                        int choice = JOptionPane.showConfirmDialog(
-                                this,
-                                winner + " wins! Play again?",
-                                "Game Over",
-                                JOptionPane.YES_NO_OPTION
-                        );
-
-                        if (choice == JOptionPane.YES_OPTION) {
-                            resetBoard(); // Starts new game
-                        } else {
-                            resetBoard();
-                            cardLayout.show(mainPanel, "MENU"); // Return to menu
-                        }
-
+                    // Safety: ignore if already used / disabled
+                    if (!boardButtons[row][col].isEnabled()) {
                         return;
                     }
 
-                    // Checks if there is a draw
-                    if (isBoardFull()) {
+                    // Human move
+                    makeMove(row, col);
 
-                        int choice = JOptionPane.showConfirmDialog(
-                                this,
-                                "It's a draw! Play again?",
-                                "Game Over",
-                                JOptionPane.YES_NO_OPTION
-                        );
-
-                        if (choice == JOptionPane.YES_OPTION) {
-                            resetBoard();
-                        } else {
-                            resetBoard();
-                            cardLayout.show(mainPanel, "MENU");
-                        }
-
+                    // If game ended, stop
+                    if (isGameOverAndHandle()) {
                         return;
                     }
 
-                    currentPlayer = (currentPlayer == 'X') ? 'O' : 'X'; // Switches X -> O or O -> X for next player
-                    turnLabel.setText("Turn: " + currentPlayer); // Update turn label
-                    return; // Exits the method
+                    // Computer move (only if 1-player and it's O's turn)
+                    if (onePlayerMode && currentPlayer == 'O') {
+                        computerMove();
+
+                        // Check again after computer move
+                        isGameOverAndHandle();
+                    }
+
+                    return;
                 }
             }
         }
+    }
+
+    // Reusable move logic for BOTH human and computer
+    private void makeMove(int row, int col) {
+        boardButtons[row][col].setText(String.valueOf(currentPlayer));
+        boardButtons[row][col].setEnabled(false);
+
+        // Switch player for next turn
+        currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
+        turnLabel.setText("Turn: " + currentPlayer);
+    }
+
+    // Handles win/draw popups + play again flow
+    // Returns true if game ended (win/draw), false otherwise
+    private boolean isGameOverAndHandle() {
+        char winner = checkWinner();
+        if (winner != '\0') {
+            int choice = JOptionPane.showConfirmDialog(
+                    this,
+                    winner + " wins! Play again?",
+                    "Game Over",
+                    JOptionPane.YES_NO_OPTION
+            );
+
+            if (choice == JOptionPane.YES_OPTION) {
+                resetBoard();
+            } else {
+                resetBoard();
+                cardLayout.show(mainPanel, "MENU");
+            }
+            return true;
+        }
+
+        if (isBoardFull()) {
+            int choice = JOptionPane.showConfirmDialog(
+                    this,
+                    "It's a draw! Play again?",
+                    "Game Over",
+                    JOptionPane.YES_NO_OPTION
+            );
+
+            if (choice == JOptionPane.YES_OPTION) {
+                resetBoard();
+            } else {
+                resetBoard();
+                cardLayout.show(mainPanel, "MENU");
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    // Simple AI: pick a random available square for O
+    private void computerMove() {
+        List<Point> open = new ArrayList<>();
+
+        for (int r = 0; r < 3; r++) {
+            for (int c = 0; c < 3; c++) {
+                if (boardButtons[r][c].isEnabled() && boardButtons[r][c].getText().isEmpty()) {
+                    open.add(new Point(r, c));
+                }
+            }
+        }
+
+        if (open.isEmpty()) {
+            return;
+        }
+
+        Point choice = open.get(rng.nextInt(open.size()));
+        makeMove(choice.x, choice.y);
     }
 
     private char checkWinner() {
@@ -287,9 +350,8 @@ public class TicTacToe extends JFrame implements ActionListener {
             String b = boardButtons[row][1].getText();
             String c = boardButtons[row][2].getText();
 
-            // First letter cannot be empty & all three must be equal
             if (!a.isEmpty() && a.equals(b) && a.equals(c)) {
-                return a.charAt(0); // 'X' or 'O'
+                return a.charAt(0);
             }
         }
 
@@ -321,7 +383,7 @@ public class TicTacToe extends JFrame implements ActionListener {
             }
         }
 
-        return '\0'; // no winner
+        return '\0';
     }
 
     private void resetBoard() {
@@ -347,7 +409,6 @@ public class TicTacToe extends JFrame implements ActionListener {
     }
 
     public static void main(String[] args) {
-        // Launches the application and creates the GUI
         SwingUtilities.invokeLater(TicTacToe::new);
     }
 }
