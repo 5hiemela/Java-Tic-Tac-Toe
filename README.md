@@ -1,6 +1,8 @@
 # Java Tic-Tac-Toe
 A desktop-based Tic-Tac-Toe application built using **Java Swing**, featuring both single-player and local multiplayer modes.
 
+![Tic-Tac-Toe Demo](screenshots/TicTacToeDemo.gif)
+
 ## Features
 * **Dynamic GUI:** Built with `JFrame` and `JPanel` for a responsive graphical interface.
 * **Multiple Game Modes:** Support for 1-Player (vs. CPU) and 2-Player local modes.
