@@ -1,25 +1,20 @@
-# Java-Tic-Tac-Toe (Java Swing)
-
-This is a personal Java project that implements a fully functional Tic-Tac-Toe game using Java Swing.
+# Java Tic-Tac-Toe
+A desktop-based Tic-Tac-Toe application built using **Java Swing**, featuring both single-player and local multiplayer modes.
 
 ## Features
-- Graphical user interface using JFrame and JPanel
-- Menu screen with Start, Rules, and Quit
-- 1-player mode against a simple computer opponent
-- 2-player mode (X always starts)
-- Turn indicator
-- Win and draw detection
-- Play again dialog
-- Reset and Back buttons
-- Board implemented with a 3x3 JButton grid
+* **Dynamic GUI:** Built with `JFrame` and `JPanel` for a responsive graphical interface.
+* **Multiple Game Modes:** Support for 1-Player (vs. CPU) and 2-Player local modes.
+* **Intuitive Navigation:** Includes a main menu, rules page, and mid-game controls (Reset/Back).
+* **Game Logic:** Automated win/draw detection and a turn indicator.
+* **State Management:** Uses `CardLayout` for seamless screen transitions.
 
-## Tech Used
-- Java
-- Java Swing
+## Tech Stack
+* **Language:** Java
+* **Framework:** Java Swing (GUI)
+* **Architecture:** Event-Driven Programming
 
-## What I Practiced
-- Event-driven programming
-- GUI design with Swing
-- Using CardLayout to switch screens
-- Handling game state and user input
-- Implementing basic AI logic
+## Core Competencies
+* **Event Handling:** Implemented `ActionListener` for 3x3 grid interactions and menu navigation.
+* **UI/UX Design:** Utilized layout managers to maintain component alignment and visual hierarchy.
+* **Game State Logic:** Managed player turns, symbol toggling, and win-condition algorithms.
+* **AI Implementation:** Developed basic logic for computer-opponent decision-making.
